@@ -23,18 +23,19 @@ class _ProductScreenState extends State<ProductScreen> {
   }
 
   Future<void> _fetchProductData(String barcode) async {
-    final url = Uri.parse('https://world.openfoodfacts.org/api/v0/product/$barcode.json');
+    //final url = Uri.parse('https://world.openfoodfacts.org/api/v0/product/$barcode.json');
+    final url = Uri.parse('https://boxpvp.top:8443/api/barcodeinfo?barcode=$barcode');
 
     try {
       final response = await http.get(url);
-      final data = json.decode(response.body);
 
-      if (data['status'] == 1) {
-        final product = data['product'];
-        name = product['product_name'] ?? 'Nieznany produkt';
-        brand = product['brands'] ?? 'Brak marki';
-        country = product['countries'] ?? 'Brak kraju';
-        isFromUSA = country!.toLowerCase().contains('united states');
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        name = data['Name'] ?? 'Nieznany produkt';
+        brand = data['Brand'] ?? 'Brak marki';
+        country = data['Country'] ?? 'Brak kraju';
+        isFromUSA = data['IsFromUSA'] == true;
 
         setState(() {});
       } else {
