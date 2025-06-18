@@ -8,39 +8,26 @@ class ScannerScreen extends StatefulWidget {
   State<ScannerScreen> createState() => _ScannerScreenState();
 }
 
+
+
 class _ScannerScreenState extends State<ScannerScreen> {
   bool _isProcessing = false;
   String? _lastScannedCode;
   DateTime? _lastScanTime;
+  MobileScannerController cameraController = MobileScannerController();
 
-
-  void _fetchProductInfo(String barcode) async {
-    if (_isProcessing) return;
-    setState(() => _isProcessing = true);
-
-    final url = Uri.parse('https://world.openfoodfacts.org/api/v0/product/$barcode.json');
-    try {
-      final response = await http.get(url);
-      final data = json.decode(response.body);
-
-      if (data['status'] == 1) {
-        final product = data['product'];
-        final name = product['product_name'] ?? 'Nieznany produkt';
-        final brand = product['brands'] ?? 'Brak marki';
-        final country = product['countries'] ?? 'Brak kraju';
-        _showDialog("✅ Produkt znaleziony", "Nazwa: $name\nMarka: $brand\nKraj: $country");
-      } else {
-        _showDialog("❌ Nie znaleziono", "Kod: $barcode");
-      }
-    } catch (e) {
-      _showDialog("Błąd", "Nie udało się pobrać danych.");
-    } finally {
-      Future.delayed(const Duration(seconds: 1), () {
-        setState(() => _isProcessing = false);
-      });
-    }
+  @override
+  void initState() {
+    super.initState();
+    // odpalamy kamerę dopiero po chwili (żeby Android puścił dostęp)
+    Future.delayed(Duration(milliseconds: 200), () {
+      cameraController.start();
+    });
   }
 
+
+
+  /*
   void _showDialog(String title, String content) {
     showDialog(
       context: context,
@@ -56,13 +43,15 @@ class _ScannerScreenState extends State<ScannerScreen> {
     );
   }
 
-  @override
+   */
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
           MobileScanner(
+            controller: cameraController,
             onDetect: (barcode) {
               if (barcode.barcodes.isNotEmpty) {
                 final code = barcode.barcodes.first.rawValue;
@@ -109,5 +98,10 @@ class _ScannerScreenState extends State<ScannerScreen> {
         ],
       ),
     );
+  }
+  @override
+  void dispose() {
+    cameraController.dispose();
+    super.dispose();
   }
 }

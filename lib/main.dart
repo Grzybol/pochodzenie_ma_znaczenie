@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'login_screen.dart';
 import 'scanner_screen.dart';
 import 'product_screen.dart';
 
@@ -18,9 +19,10 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
       ),
-      initialRoute: '/',
+      initialRoute: '/login',
       routes: {
-        '/': (context) => ScannerScreen(),
+        '/login': (context) => LoginScreen(),
+        '/scanner': (context) => ScannerScreen(),
         '/product': (context) => ProductScreen(),
       },
     );
