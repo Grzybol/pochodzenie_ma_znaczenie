@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'login_screen.dart';
+
 class ProductScreen extends StatefulWidget {
   @override
   State<ProductScreen> createState() => _ProductScreenState();
@@ -27,7 +29,10 @@ class _ProductScreenState extends State<ProductScreen> {
     final url = Uri.parse('https://boxpvp.top:8443/api/barcodeinfo?barcode=$barcode');
 
     try {
-      final response = await http.get(url);
+      final response = await http.get(
+          url,
+          headers: { 'Authorization': 'Bearer ${Auth.token}' }
+      );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
