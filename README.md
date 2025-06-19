@@ -94,4 +94,3 @@ MIT — używaj dowolnie.
 
 ---
 
-_Projekt kodzony spontanicznie przez ekipę podczas testów apki 😉_
