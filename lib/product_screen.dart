@@ -61,72 +61,87 @@ class _ProductScreenState extends State<ProductScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Szczegóły produktu')),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: error != null
-              ? Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 60, color: Colors.red),
-              const SizedBox(height: 16),
-              Text(
-                error!,
-                style: const TextStyle(fontSize: 16),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          )
-              : name != null
-              ? Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+      body: Stack(
+        children: [
+          // Tło
+          Opacity(
+            opacity: 0.3,  // możesz dać 0.5 jak wolisz
+            child: Image.asset(
+              'assets/icon1.png',
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
             ),
+          ),
+          // Główna zawartość
+          Center(
             child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+              padding: const EdgeInsets.all(16.0),
+              child: error != null
+                  ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildDetailRow("🧾 Nazwa", name!),
-                  const SizedBox(height: 12),
-                  _buildDetailRow("🏷️ Marka", brand!),
-                  const SizedBox(height: 12),
-                  _buildDetailRow(
-                    "🌍 Kraj",
-                    country!,
-                    textColor: isFromUSA ? Colors.red : null,
-                    isBold: isFromUSA,
+                  const Icon(Icons.error_outline, size: 60, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text(
+                    error!,
+                    style: const TextStyle(fontSize: 16),
+                    textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 24),
-                  if (isFromUSA)
-                    Container(
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.red.shade50,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.red),
-                      ),
-                      child: Row(
-                        children: const [
-                          Icon(Icons.warning_amber, color: Colors.red),
-                          SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              "Produkt pochodzi z USA!",
-                              style: TextStyle(color: Colors.red),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                 ],
-              ),
+              )
+                  : name != null
+                  ? Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildDetailRow("🧾 Nazwa", name!),
+                      const SizedBox(height: 12),
+                      _buildDetailRow("🏷️ Marka", brand!),
+                      const SizedBox(height: 12),
+                      _buildDetailRow(
+                        "🌍 Kraj",
+                        country!,
+                        textColor: isFromUSA ? Colors.red : null,
+                        isBold: isFromUSA,
+                      ),
+                      const SizedBox(height: 24),
+                      if (isFromUSA)
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.red.shade50,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.red),
+                          ),
+                          child: Row(
+                            children: const [
+                              Icon(Icons.warning_amber, color: Colors.red),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  "Produkt pochodzi z USA!",
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              )
+                  : const CircularProgressIndicator(),
             ),
-          )
-              : const CircularProgressIndicator(),
-        ),
+          ),
+        ],
       ),
     );
   }
