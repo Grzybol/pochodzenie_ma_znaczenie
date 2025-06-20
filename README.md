@@ -1,3 +1,8 @@
+## ❗Download the test build from Google Play❗
+https://play.google.com/apps/internaltest/4701458469685316312
+## ❗test Account❗
+login: test3
+password: asd123!
 
 # 📱 Pochodzenie ma znaczenie
 
