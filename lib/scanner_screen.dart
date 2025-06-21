@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:pochodzenie_ma_znaczenie/utils.dart';
+import 'login_screen.dart';
 
 class ScannerScreen extends StatefulWidget {
   @override
@@ -19,10 +21,17 @@ class _ScannerScreenState extends State<ScannerScreen> {
   @override
   void initState() {
     super.initState();
-    // odpalamy kamerę dopiero po chwili (żeby Android puścił dostęp)
-    Future.delayed(Duration(milliseconds: 200), () {
-      cameraController.start();
-    });
+    if (isTokenExpired(Auth.token)) {
+      // TODO: wysłać powiadomienie i przekierować na login
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacementNamed(context, '/login');
+      });
+    } else {
+      // kamera dopiero jak token ważny
+      Future.delayed(Duration(milliseconds: 200), () {
+        cameraController.start();
+      });
+    }
   }
 
 
