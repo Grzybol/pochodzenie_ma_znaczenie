@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:pochodzenie_ma_znaczenie/utils.dart';
 import 'login_screen.dart';
+import 'main.dart';
 
 class ScannerScreen extends StatefulWidget {
   @override
@@ -33,6 +35,8 @@ class _ScannerScreenState extends State<ScannerScreen> {
       });
     }
   }
+
+
 
 
 
@@ -76,6 +80,9 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
                   _lastScannedCode = code;
                   _lastScanTime = now;
+
+                  // Wyświetl powiadomienie - testowy push:
+                  //_showSuccessNotification(code);
 
                   Navigator.pushNamed(
                     context,
