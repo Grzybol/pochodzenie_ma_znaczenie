@@ -5,12 +5,13 @@ import 'scanner_screen.dart';
 import 'product_screen.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
-
-
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  print('[main] Starting app initialization');
+  await Auth.loadFromPrefs();
+  print('[main] Finished Auth.loadFromPrefs');
 
   const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
   const InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
@@ -24,6 +25,7 @@ Future<void> main() async {
     },
   );
 
+  print('[main] Calling runApp');
   runApp(const MyApp());
 }
 
