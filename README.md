@@ -4,8 +4,6 @@ https://play.google.com/apps/internaltest/4701458469685316312
 login: test3
 password: asd123!
 
-# 📱 Pochodzenie ma znaczenie
-
 Aplikacja mobilna Flutter do sprawdzania kraju pochodzenia produktów na podstawie kodu kreskowego.  
 Projekt na wczesnym etapie — MVP, 100% open-source.
 
@@ -96,6 +94,7 @@ Authorization: Bearer <TOKEN>
 ## 📝 Licencja
 
 MIT — używaj dowolnie.
+
 
 ---
 

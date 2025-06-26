@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'package:pochodzenie_ma_znaczenie/utils.dart';
 import 'login_screen.dart';
 
 class ProductScreen extends StatefulWidget {
@@ -41,6 +41,9 @@ class _ProductScreenState extends State<ProductScreen> {
         brand = data['Brand'] ?? 'Brak marki';
         country = data['Country'] ?? 'Brak kraju';
         isFromUSA = data['IsFromUSA'] == true;
+        // Wyświetl powiadomienie - testowy push:
+        NotificationUtils.showSuccessNotification("$name $brand $country");
+
 
         setState(() {});
       } else {
