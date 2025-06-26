@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
@@ -80,5 +81,56 @@ Future<void> showTokenExpiredNotification() async {
     'Musisz się ponownie zalogować',
     platformDetails,
   );
+}
+
+class ProductCache {
+  static const _prefix = 'product_';
+  static const _ttlKey = 'cache_ttl_hours';
+  static const _defaultTtlHours = 24;
+
+  static Future<int> getTtlHours() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_ttlKey) ?? _defaultTtlHours;
+  }
+
+  static Future<void> setTtlHours(int hours) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_ttlKey, hours);
+  }
+
+  static Future<void> saveProduct(String barcode, Map<String, dynamic> data) async {
+    final prefs = await SharedPreferences.getInstance();
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final ttl = await getTtlHours();
+    final expiry = now + ttl * 3600 * 1000;
+    final value = json.encode({'data': data, 'expiry': expiry});
+    await prefs.setString(_prefix + barcode, value);
+  }
+
+  static Future<Map<String, dynamic>?> getProduct(String barcode) async {
+    final prefs = await SharedPreferences.getInstance();
+    final value = prefs.getString(_prefix + barcode);
+    if (value == null) return null;
+    final decoded = json.decode(value);
+    final expiry = decoded['expiry'] as int?;
+    if (expiry == null || DateTime.now().millisecondsSinceEpoch > expiry) {
+      await prefs.remove(_prefix + barcode);
+      return null;
+    }
+    return Map<String, dynamic>.from(decoded['data']);
+  }
+
+  static Future<void> clearCache() async {
+    final prefs = await SharedPreferences.getInstance();
+    final keys = prefs.getKeys().where((k) => k.startsWith(_prefix)).toList();
+    for (final k in keys) {
+      await prefs.remove(k);
+    }
+  }
+
+  static Future<int> getCacheSize() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getKeys().where((k) => k.startsWith(_prefix)).length;
+  }
 }
 

@@ -1,99 +1,102 @@
-## ❗Download the test build from Google Play❗
-https://play.google.com/apps/internaltest/4701458469685316312
-## ❗test Account❗
-login: test3
-password: asd123!
+# Pochodzenie Ma Znaczenie
 
-Aplikacja mobilna Flutter do sprawdzania kraju pochodzenia produktów na podstawie kodu kreskowego.  
-Projekt na wczesnym etapie — MVP, 100% open-source.
+Aplikacja mobilna Flutter do sprawdzania kraju pochodzenia produktów na podstawie kodu kreskowego. Projekt jest open-source i znajduje się na etapie MVP.
 
-## ✨ Funkcje
+## Funkcjonalności
 
-- ✅ Logowanie użytkownika (token JWT)
-- ✅ Skanowanie kodów kreskowych (kamera)
-- ✅ Pobieranie informacji o produkcie (nazwa, marka, kraj)
-- ✅ Wyróżnianie produktów pochodzących z USA
-- ✅ Tryb testowy bez skanera
+- Logowanie użytkownika z użyciem JWT (wymagane do korzystania z aplikacji)
+- Skanowanie kodów kreskowych za pomocą kamery urządzenia
+- Pobieranie informacji o produkcie (nazwa, marka, kraj) z backendu REST API
+- Wyróżnianie produktów pochodzących z USA
+- Tryb testowy (ręczne wpisanie kodu bez użycia kamery)
+- Lokalny cache danych produktów z konfigurowalnym czasem życia (TTL)
+- Panel ustawień w aplikacji do zarządzania cache (zmiana TTL, czyszczenie cache, informacja o liczbie produktów w cache)
+- Automatyczne odświeżanie tokena JWT po wygaśnięciu (wykorzystanie endpointu /renew)
 
-## 🛠️ Stack technologiczny
+## Stos technologiczny
 
 - Flutter 3.x
 - Dart
-- Biblioteka [`mobile_scanner`](https://pub.dev/packages/mobile_scanner)
-- Backend REST API (Spring Boot, endpointy `/api/login` i `/api/barcodeinfo`)
+- Biblioteka [mobile_scanner](https://pub.dev/packages/mobile_scanner)
+- Backend REST API (Spring Boot, endpointy: /api/login, /api/barcodeinfo, /api/renew)
+- Lokalna pamięć: shared_preferences
 
-## 🔧 Struktura aplikacji
+## Struktura aplikacji
 
-| Ekran               | Klasa                |
-|---------------------|----------------------|
-| Ekran logowania     | `LoginScreen`        |
-| Skaner kodów        | `ScannerScreen`      |
-| Szczegóły produktu  | `ProductScreen`      |
-| Główna konfiguracja | `MyApp` (`main.dart`) |
+| Ekran              | Klasa             |
+|--------------------|------------------|
+| Logowanie          | LoginScreen       |
+| Skaner kodów       | ScannerScreen     |
+| Szczegóły produktu | ProductScreen     |
+| Konfiguracja główna| MyApp (main.dart) |
 
-## 🗺️ Flow aplikacji
+## Przepływ aplikacji
 
-1. Użytkownik loguje się do systemu → otrzymuje token JWT
-2. Trafia na ekran skanera
+1. Użytkownik loguje się i otrzymuje token JWT
+2. Przechodzi na ekran skanera
 3. Skanuje kod kreskowy produktu
-4. Aplikacja pobiera dane z backendu `/api/barcodeinfo`
-5. Wyświetla szczegóły produktu  
-   (jeżeli kraj = USA → wyświetla ostrzeżenie)
+4. Aplikacja sprawdza lokalny cache:
+   - Jeśli dane są obecne i ważne (nieprzeterminowane), używa cache
+   - Jeśli nie ma danych lub są przeterminowane, pobiera z backendu (/api/barcodeinfo)
+5. Wyświetlane są szczegóły produktu
+   - Jeśli kraj to USA, pojawia się ostrzeżenie
 
-## 🔑 Logowanie
+## Autoryzacja i zarządzanie tokenem
 
-Backend wymaga autoryzacji — token JWT jest pobierany po poprawnym logowaniu:
+- Backend wymaga autoryzacji JWT. Token uzyskiwany jest po poprawnym logowaniu:
 
-```http
-POST /api/login
-Content-Type: application/json
+      POST /api/login
+      Content-Type: application/json
 
-{
-  "playerName": "nazwa_uzytkownika",
-  "password": "haslo"
-}
-```
+      {
+        "playerName": "nazwa_uzytkownika",
+        "password": "haslo"
+      }
 
-Token jest automatycznie przekazywany w nagłówku do dalszych requestów:
+- Token przekazywany jest w nagłówku Authorization przy wszystkich kolejnych żądaniach:
 
-```http
-Authorization: Bearer <TOKEN>
-```
+      Authorization: Bearer <TOKEN>
 
-## 🚀 Uruchomienie lokalne
+- Aplikacja automatycznie odświeża token JWT po jego wygaśnięciu (endpoint /api/renew). W przypadku niepowodzenia użytkownik zostaje wylogowany.
 
-1. Skopiuj repozytorium:
+## Lokalny cache
 
-    ```bash
-    git clone https://github.com/TwojeRepozytorium/pochodzenie-ma-znaczenie.git
-    cd pochodzenie-ma-znaczenie
-    ```
+- Dane produktów są cache'owane lokalnie przy użyciu shared_preferences
+- Czas życia cache (TTL, w godzinach) można ustawić w panelu ustawień aplikacji
+- Panel ustawień pozwala na:
+  - Zmianę TTL cache (liczba całkowita, godziny)
+  - Wyczyść lokalny cache
+  - Sprawdzenie liczby produktów w cache
+- Jeśli produkt znajduje się w cache i nie jest przeterminowany, aplikacja nie wykonuje zapytania do backendu
+
+## Uruchomienie lokalne
+
+1. Sklonuj repozytorium:
+
+       git clone https://github.com/TwojeRepozytorium/pochodzenie-ma-znaczenie.git
+       cd pochodzenie-ma-znaczenie
 
 2. Zainstaluj zależności:
 
-    ```bash
-    flutter pub get
-    ```
+       flutter pub get
 
-3. Uruchom:
+3. Uruchom aplikację:
 
-    ```bash
-    flutter run
-    ```
+       flutter run
 
-> Wymagane: urządzenie fizyczne lub emulator z dostępem do kamery.
+   Wymagane jest urządzenie fizyczne lub emulator z dostępem do kamery.
 
-## 📂 TODO / Roadmap
+## Roadmap
 
-- [ ] Rejestracja nowego użytkownika
-- [ ] Ekran ustawień
-- [ ] Historia skanów
-- [ ] Obsługa offline / cache
-- [ ] Konfiguracja własnego backendu (adres API z poziomu ustawień)
+- Rejestracja użytkownika
+- Rozbudowany ekran ustawień
+- Historia skanów
+- Obsługa offline / ulepszenia cache
+- Możliwość konfiguracji własnego backendu (adres API w ustawieniach)
 
-## 📝 Licencja
+## Licencja
 
-MIT — używaj dowolnie.
+MIT License
 
 
 ---

@@ -1,10 +1,69 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class Auth {
   static String? token;
+  static String? playerName;
+
+  static Future<void> setToken(String newToken, String user) async {
+    print('[Auth] setToken: token=$newToken, playerName=$user');
+    token = newToken;
+    playerName = user;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('jwt_token', newToken);
+    await prefs.setString('player_name', user);
+  }
+
+  static Future<void> loadFromPrefs() async {
+    print('[Auth] loadFromPrefs: loading...');
+    final prefs = await SharedPreferences.getInstance();
+    token = prefs.getString('jwt_token');
+    playerName = prefs.getString('player_name');
+    print('[Auth] loadFromPrefs: token=$token, playerName=$playerName');
+  }
+
+  static Map<String, String> getAuthHeaders() {
+    return {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    };
+  }
+
+  static Future<void> logout() async {
+    token = null;
+    playerName = null;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('jwt_token');
+    await prefs.remove('player_name');
+  }
+
+  static Future<bool> refreshToken() async {
+    const baseUrl = 'https://boxpvp.top:8443/api';
+    print('[Auth] refreshToken: token=$token, playerName=$playerName');
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/renew'),
+        headers: getAuthHeaders(),
+      );
+      print('[Auth] refreshToken: response.statusCode=${response.statusCode}');
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        await setToken(data['token'], playerName!);
+        print('[Auth] Token refreshed successfully');
+        return true;
+      } else {
+        print('[Auth] Failed to refresh token: ${response.statusCode}');
+        await logout();
+        return false;
+      }
+    } catch (e) {
+      print('[Auth] Error refreshing token: $e');
+      return false;
+    }
+  }
 }
 
 class LoginScreen extends StatefulWidget {
@@ -41,8 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        Auth.token = data['token'];
-
+        await Auth.setToken(data['token'], username);
         // przejście do skanera
         Navigator.pushReplacementNamed(context, '/scanner');
       } else {
