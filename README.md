@@ -2,7 +2,7 @@
 
 Aplikacja mobilna Flutter do sprawdzania kraju pochodzenia produktów na podstawie kodu kreskowego. Projekt jest open-source i znajduje się na etapie MVP.
 
-#Testy wewnętrzne
+## Testy wewnętrzne
 https://play.google.com/apps/internaltest/4701458469685316312
 
 ## Funkcjonalności
